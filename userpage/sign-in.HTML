@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            background-image: url(maharas.jpg); /* Replace with your background image URL */
+            background-size: cover; /* Add this line to make the image cover the whole page */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .signin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        label {
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button {
+            background-color: #006d8f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <title>Sign In</title>
+</head>
+<body>
+    <div class="container">
+        <form class="signin-form" id="signinForm">
+            <h2>Sign In</h2>
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            
+            <label for="whatsapp">WhatsApp Number</label>
+            <input type="tel" id="whatsapp" name="whatsapp" required>
+            
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" required>
+            
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+<!-- Include Firebase SDKs -->
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.3.2/firebase-database.js"></script>
+
+<!-- Initialize Firebase and add JavaScript code -->
+<script>
+    // Your Firebase configuration here
+    const firebaseConfig = {
+  apiKey: "AIzaSyD1-3lDy6kQB4hTUllQfDDJc8gwuFx2t38",
+  authDomain: "devoties-38141.firebaseapp.com",
+  databaseURL: "https://devoties-38141-default-rtdb.firebaseio.com",
+  projectId: "devoties-38141",
+  storageBucket: "devoties-38141.appspot.com",
+  messagingSenderId: "761143185816",
+  appId: "1:761143185816:web:cbeb325b77c32a5a0f1bed",
+  measurementId: "G-YG8FLS9EFQ"
+};
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    const signinForm = document.querySelector("#signinForm");
+    signinForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const name = document.querySelector("#name").value;
+        const email = document.querySelector("#email").value;
+        const password = document.querySelector("#password").value;
+        const whatsapp = document.querySelector("#whatsapp").value;
+        const location = document.querySelector("#location").value;
+
+        // Sign in with email and password
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(function(userCredential) {
+                const uid = userCredential.user.uid;
+                // Store user data in the Firebase Realtime Database
+                firebase.database().ref("users/" + uid).set({
+                    name: name,
+                    whatsapp: whatsapp,
+                    location: location
+                });
+                generateAndDownloadQR(uid);
+
+                signinForm.reset();
+
+                // Open the login page
+                window.location.href = "login.html"; 
+            })
+            .catch(function(error) {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.error(errorMessage);
+                alert(errorMessage);
+            });
+    });
+    function generateAndDownloadQR(uid) {
+        // Generate QR code
+        const qrcodeDiv = document.createElement("div");
+        const qrcode = new QRCode(qrcodeDiv, {
+            text: uid,
+            width: 256,
+            height: 256
+        });
+
+        // Create a canvas from the QR code
+        const canvas = qrcodeDiv.querySelector("canvas");
+
+        // Create a data URL from the canvas and trigger download
+        const dataUrl = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement("a");
+        downloadLink.href = dataUrl;
+        downloadLink.download = "qrcode.png";
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+</script>
+</body>
+</html>

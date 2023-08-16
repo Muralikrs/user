@@ -1,0 +1,23 @@
+/* mobile.css */
+body {
+    background-image: url(Mobile.jpg);
+}
+
+.container {
+    padding: 50px;
+}
+
+.login-btn, .signin-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.social-icons {
+    bottom: 10px;
+    left: 10px;
+}
+
+.social-icons img {
+    width: 20px;
+    height: 20px;
+}
